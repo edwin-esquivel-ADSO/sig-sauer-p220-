@@ -4,6 +4,7 @@ import { TacticalHUD } from './components/TacticalHUD';
 import { ScrollytellingOverlay } from './components/ScrollytellingOverlay';
 import { WorkbenchDossier } from './components/WorkbenchDossier';
 import { RealPhotoModal } from './components/RealPhotoModal';
+import { QRCodeModal } from './components/QRCodeModal';
 import { SCROLL_STEPS } from './data/p220Data';
 import { soundEngine } from './utils/audio';
 
@@ -11,6 +12,7 @@ export function App() {
   const [isMuted, setIsMuted] = useState(true);
   const [isWorkbenchMode, setIsWorkbenchMode] = useState(false);
   const [isRealPhotoModalOpen, setIsRealPhotoModalOpen] = useState(false);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   // Workbench 3D controls state
@@ -137,6 +139,7 @@ export function App() {
         totalSteps={SCROLL_STEPS.length}
         onJumpToWorkbench={handleEnterWorkbench}
         onOpenRealPhotoModal={() => setIsRealPhotoModalOpen(true)}
+        onOpenQRModal={() => setIsQRModalOpen(true)}
       />
 
       {/* MODE 1: SCROLLYTELLING VIEW */}
@@ -224,6 +227,12 @@ export function App() {
         onClose={() => setIsRealPhotoModalOpen(false)}
       />
 
+      {/* Integrated QR Code Modal */}
+      <QRCodeModal
+        isOpen={isQRModalOpen}
+        onClose={() => setIsQRModalOpen(false)}
+      />
+
       {/* Footer */}
       <footer className="w-full mt-auto py-5 px-4 border-t border-slate-200 bg-white text-center text-xs font-mono text-slate-500 relative z-20">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
@@ -233,8 +242,15 @@ export function App() {
               SIG SAUER P220 .45 ACP // SISTEMA DE DESPIECE INTERACTIVO 3D
             </span>
           </div>
-          <div>
-            <span className="text-[10px] sm:text-xs">Diseño de alta precisión militar • Optimizado para móviles & Vercel</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsQRModalOpen(true)}
+              className="text-amber-700 hover:text-amber-800 font-tactical font-semibold flex items-center gap-1 cursor-pointer"
+            >
+              <span>ESCANEÁR CÓDIGO QR</span>
+            </button>
+            <span className="text-slate-300">|</span>
+            <span className="text-[10px] sm:text-xs">Listo para Vercel</span>
           </div>
         </div>
       </footer>
