@@ -46,9 +46,8 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
   const smoothExplosion = useRef(0);
   const fireAnim = useRef(0);
 
-  // PBR Materials tuned specifically for authentic Nitron black & brushed steel on light backgrounds
-  // Low metalness (0.04) and high roughness (0.65-0.75) prevent white specular blowout on light backgrounds,
-  // ensuring the firearm remains deep, rich, velvety military black at all angles.
+  // Strictly typed PBR & X-Ray Materials
+  // Using direct material properties ensures all meshes are properly colored
   const materials: MaterialPalette = useMemo(() => {
     if (isXRay) {
       const xrayMat = new THREE.MeshStandardMaterial({
@@ -98,41 +97,41 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
     }
 
     return {
-      // True Satin Nitron Black for Slide (Chemical Vapor Deposition - Deep Black)
+      // True Satin Nitron Black for Slide (PVD TiCN finish) - Deep black
       nitron: new THREE.MeshStandardMaterial({
-        color: 0x0a0b0d,
-        metalness: 0.05,
+        color: 0x101216,
+        metalness: 0.15,
+        roughness: 0.55,
+      }),
+      // Matte Type III Hard-Coat Anodized Black for Aluminum Frame
+      nitronFrame: new THREE.MeshStandardMaterial({
+        color: 0x0a0c0f,
+        metalness: 0.08,
         roughness: 0.68,
       }),
-      // Matte Type III Hard-Coat Anodized Black for Aluminum Frame (Pitch Black Diffuse)
-      nitronFrame: new THREE.MeshStandardMaterial({
-        color: 0x07080a,
-        metalness: 0.03,
-        roughness: 0.75,
-      }),
-      // Brushed 416R Stainless Steel for Chamber Hood & Barrel (High-Contrast Steel)
+      // Brushed 416R Stainless Steel for Chamber Hood & Barrel Exterior
       steel: new THREE.MeshStandardMaterial({
-        color: 0x9aa2af,
-        metalness: 0.75,
-        roughness: 0.32,
+        color: 0x9ca3af,
+        metalness: 0.82,
+        roughness: 0.3,
       }),
-      // Phosphated / Tool Steel for Extractor, Pins & Levers (Dark Charcoal)
+      // Phosphated / Tool Steel for Extractor, Pins & Levers
       phosphated: new THREE.MeshStandardMaterial({
-        color: 0x15171c,
-        metalness: 0.1,
-        roughness: 0.7,
+        color: 0x181a20,
+        metalness: 0.2,
+        roughness: 0.65,
       }),
-      // Checkered Jet-Black Grips (Deep textured black polymer)
+      // Checkered Deep Jet-Black Grips
       grips: new THREE.MeshStandardMaterial({
-        color: 0x040506,
-        metalness: 0.01,
+        color: 0x060708,
+        metalness: 0.02,
         roughness: 0.88,
       }),
       // Polished Brass Cartridge Casing
       brass: new THREE.MeshStandardMaterial({
         color: 0xd4af37,
-        metalness: 0.9,
-        roughness: 0.24,
+        metalness: 0.92,
+        roughness: 0.22,
       }),
       // Copper Full Metal Jacket (FMJ) Bullet Nose
       copper: new THREE.MeshStandardMaterial({
@@ -145,7 +144,7 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
       // Active Selection Highlight
       accentHighlight: new THREE.MeshStandardMaterial({
         color: 0xd97706,
-        metalness: 0.2,
+        metalness: 0.35,
         roughness: 0.35,
         emissive: 0xd97706,
         emissiveIntensity: 0.5,
@@ -244,73 +243,66 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         }}
       >
         {/* Main Slide Body */}
-        <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
+        <mesh
+          position={[0, 0.45, 0]}
+          castShadow
+          receiveShadow
+          material={isSlideHighlighted && highlightPart === 'slide' ? materials.accentHighlight : materials.nitron}
+        >
           <boxGeometry args={[0.56, 0.62, 3.8]} />
-          <primitive object={isSlideHighlighted && highlightPart === 'slide' ? materials.accentHighlight : materials.nitron} />
         </mesh>
 
         {/* Upper Slide Chamfer / Bevel Top Profile */}
-        <mesh position={[0, 0.77, 0]} castShadow>
+        <mesh position={[0, 0.77, 0]} castShadow material={materials.nitron}>
           <boxGeometry args={[0.46, 0.1, 3.75]} />
-          <primitive object={materials.nitron} />
         </mesh>
 
         {/* Stepped Front Dustcover Chin */}
-        <mesh position={[0, 0.28, 1.4]} castShadow>
+        <mesh position={[0, 0.28, 1.4]} castShadow material={materials.nitron}>
           <boxGeometry args={[0.55, 0.25, 0.9]} />
-          <primitive object={materials.nitron} />
         </mesh>
 
         {/* Ejection Port Cutout (Chamber Window on top-right) */}
-        <mesh position={[0.22, 0.58, 0.15]}>
+        <mesh position={[0.22, 0.58, 0.15]} material={materials.steel}>
           <boxGeometry args={[0.18, 0.38, 0.95]} />
-          <primitive object={materials.steel} />
         </mesh>
 
         {/* Rear Cocking Serrations (Left & Right Gripping Grooves) */}
         {[-1.3, -1.4, -1.5, -1.6].map((z, idx) => (
           <React.Fragment key={`serration-${idx}`}>
-            <mesh position={[-0.29, 0.48, z]}>
+            <mesh position={[-0.29, 0.48, z]} material={materials.phosphated}>
               <boxGeometry args={[0.02, 0.45, 0.04]} />
-              <primitive object={materials.phosphated} />
             </mesh>
-            <mesh position={[0.29, 0.48, z]}>
+            <mesh position={[0.29, 0.48, z]} material={materials.phosphated}>
               <boxGeometry args={[0.02, 0.45, 0.04]} />
-              <primitive object={materials.phosphated} />
             </mesh>
           </React.Fragment>
         ))}
 
         {/* Front Sight Post Dovetail */}
-        <mesh position={[0, 0.86, 1.7]} castShadow>
+        <mesh position={[0, 0.86, 1.7]} castShadow material={materials.nitron}>
           <boxGeometry args={[0.08, 0.14, 0.18]} />
-          <primitive object={materials.nitron} />
         </mesh>
         {/* Front Night Sight Tritium Green Dot */}
-        <mesh position={[0, 0.87, 1.62]}>
+        <mesh position={[0, 0.87, 1.62]} material={materials.tritium}>
           <sphereGeometry args={[0.03, 12, 12]} />
-          <primitive object={materials.tritium} />
         </mesh>
 
         {/* Rear Combat Sight Dovetail */}
-        <mesh position={[0, 0.86, -1.72]} castShadow>
+        <mesh position={[0, 0.86, -1.72]} castShadow material={materials.nitron}>
           <boxGeometry args={[0.34, 0.16, 0.2]} />
-          <primitive object={materials.nitron} />
         </mesh>
         {/* Rear Night Sight Tritium Dual Dots */}
-        <mesh position={[-0.1, 0.88, -1.64]}>
+        <mesh position={[-0.1, 0.88, -1.64]} material={materials.tritium}>
           <sphereGeometry args={[0.025, 12, 12]} />
-          <primitive object={materials.tritium} />
         </mesh>
-        <mesh position={[0.1, 0.88, -1.64]}>
+        <mesh position={[0.1, 0.88, -1.64]} material={materials.tritium}>
           <sphereGeometry args={[0.025, 12, 12]} />
-          <primitive object={materials.tritium} />
         </mesh>
 
         {/* External Heavy-Duty Extractor Claw */}
-        <mesh position={[0.29, 0.48, -0.45]}>
+        <mesh position={[0.29, 0.48, -0.45]} material={materials.phosphated}>
           <boxGeometry args={[0.03, 0.12, 0.42]} />
-          <primitive object={materials.phosphated} />
         </mesh>
       </group>
 
@@ -325,33 +317,33 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         }}
       >
         {/* Cylindrical Barrel */}
-        <mesh position={[0, 0.42, 0.95]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <mesh
+          position={[0, 0.42, 0.95]}
+          rotation={[Math.PI / 2, 0, 0]}
+          castShadow
+          material={isBarrelHighlighted && highlightPart === 'barrel' ? materials.accentHighlight : materials.steel}
+        >
           <cylinderGeometry args={[0.18, 0.18, 2.3, 24]} />
-          <primitive object={isBarrelHighlighted && highlightPart === 'barrel' ? materials.accentHighlight : materials.steel} />
         </mesh>
 
         {/* Barrel Muzzle Crown Bore (Hollow Interior) */}
-        <mesh position={[0, 0.42, 2.11]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh position={[0, 0.42, 2.11]} rotation={[Math.PI / 2, 0, 0]} material={materials.phosphated}>
           <cylinderGeometry args={[0.12, 0.12, 0.05, 18]} />
-          <primitive object={materials.phosphated} />
         </mesh>
 
         {/* Squared Chamber Block (Browning-Petter-SIG Rectangular Hood) */}
-        <mesh position={[0, 0.48, 0.12]} castShadow>
+        <mesh position={[0, 0.48, 0.12]} castShadow material={materials.steel}>
           <boxGeometry args={[0.48, 0.52, 0.88]} />
-          <primitive object={materials.steel} />
         </mesh>
 
         {/* Lower Camming Lug (No swinging link - solid cam track) */}
-        <mesh position={[0, 0.14, 0.05]} castShadow>
+        <mesh position={[0, 0.14, 0.05]} castShadow material={materials.phosphated}>
           <boxGeometry args={[0.26, 0.28, 0.55]} />
-          <primitive object={materials.phosphated} />
         </mesh>
 
         {/* Polished Feed Ramp */}
-        <mesh position={[0, 0.22, -0.32]} rotation={[0.4, 0, 0]}>
+        <mesh position={[0, 0.22, -0.32]} rotation={[0.4, 0, 0]} material={materials.steel}>
           <boxGeometry args={[0.24, 0.18, 0.24]} />
-          <primitive object={materials.steel} />
         </mesh>
       </group>
 
@@ -366,18 +358,17 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         }}
       >
         {/* Steel Guide Rod */}
-        <mesh position={[0, 0.12, 0.75]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <mesh position={[0, 0.12, 0.75]} rotation={[Math.PI / 2, 0, 0]} castShadow material={materials.steel}>
           <cylinderGeometry args={[0.07, 0.07, 2.1, 16]} />
-          <primitive object={materials.steel} />
         </mesh>
 
         {/* Braided Wire Recoil Spring (Multi-strand coil simulation) */}
         <mesh position={[0, 0.12, 0.75]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.12, 0.12, 1.95, 16, 1, true]} />
           <meshStandardMaterial
-            color={0x1e293b}
+            color="#1e293b"
             roughness={0.6}
-            metalness={0.4}
+            metalness={0.3}
             wireframe={true}
           />
         </mesh>
@@ -385,7 +376,7 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         {/* SIG Signature Green Color Band at Spring Tip */}
         <mesh position={[0, 0.12, 1.7]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.125, 0.125, 0.15, 16]} />
-          <meshStandardMaterial color={0x16a34a} roughness={0.5} />
+          <meshStandardMaterial color="#16a34a" roughness={0.5} />
         </mesh>
       </group>
 
@@ -400,58 +391,54 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         }}
       >
         {/* Forward Dustcover / Frame Rails */}
-        <mesh position={[0, 0.08, 0.85]} castShadow receiveShadow>
+        <mesh
+          position={[0, 0.08, 0.85]}
+          castShadow
+          receiveShadow
+          material={isFrameHighlighted && highlightPart === 'frame' ? materials.accentHighlight : materials.nitronFrame}
+        >
           <boxGeometry args={[0.54, 0.38, 2.05]} />
-          <primitive object={isFrameHighlighted && highlightPart === 'frame' ? materials.accentHighlight : materials.nitronFrame} />
         </mesh>
 
         {/* Tactical Picatinny Accessory Rail Under Dustcover */}
-        <mesh position={[0, -0.13, 0.95]}>
+        <mesh position={[0, -0.13, 0.95]} material={materials.nitronFrame}>
           <boxGeometry args={[0.42, 0.06, 1.5]} />
-          <primitive object={materials.nitronFrame} />
         </mesh>
 
         {/* Central Frame Bridge & Locking Insert Area */}
-        <mesh position={[0, -0.05, -0.3]} castShadow>
+        <mesh position={[0, -0.05, -0.3]} castShadow material={materials.nitronFrame}>
           <boxGeometry args={[0.54, 0.55, 1.1]} />
-          <primitive object={materials.nitronFrame} />
         </mesh>
 
         {/* Ergonomic Trigger Guard with Combat Recurve */}
-        <mesh position={[0, -0.44, 0.35]}>
+        <mesh position={[0, -0.44, 0.35]} material={materials.nitronFrame}>
           <torusGeometry args={[0.42, 0.06, 12, 28, Math.PI * 0.95]} />
-          <primitive object={materials.nitronFrame} />
         </mesh>
 
         {/* Grip Frame Column (Angled 18 degrees) */}
-        <mesh position={[0, -1.15, -0.55]} rotation={[0.22, 0, 0]} castShadow receiveShadow>
+        <mesh position={[0, -1.15, -0.55]} rotation={[0.22, 0, 0]} castShadow receiveShadow material={materials.nitronFrame}>
           <boxGeometry args={[0.5, 1.9, 0.95]} />
-          <primitive object={materials.nitronFrame} />
         </mesh>
 
         {/* Extended Beavertail Profile at Grip Top */}
-        <mesh position={[0, 0.15, -1.35]} rotation={[-0.4, 0, 0]} castShadow>
+        <mesh position={[0, 0.15, -1.35]} rotation={[-0.4, 0, 0]} castShadow material={materials.nitronFrame}>
           <boxGeometry args={[0.44, 0.22, 0.55]} />
-          <primitive object={materials.nitronFrame} />
         </mesh>
 
         {/* DA/SA Curved Combat Trigger */}
         <group ref={triggerRef} position={[0, -0.32, 0.32]}>
-          <mesh rotation={[0.3, 0, 0]} castShadow>
+          <mesh rotation={[0.3, 0, 0]} castShadow material={materials.phosphated}>
             <boxGeometry args={[0.12, 0.42, 0.14]} />
-            <primitive object={materials.phosphated} />
           </mesh>
         </group>
 
         {/* External Combat Hammer with Serrated Thumb Spur */}
         <group ref={hammerRef} position={[0, 0.35, -1.55]}>
-          <mesh rotation={[-0.2, 0, 0]} castShadow>
+          <mesh rotation={[-0.2, 0, 0]} castShadow material={materials.phosphated}>
             <boxGeometry args={[0.14, 0.52, 0.25]} />
-            <primitive object={materials.phosphated} />
           </mesh>
-          <mesh position={[0, 0.26, -0.08]} rotation={[-0.6, 0, 0]}>
+          <mesh position={[0, 0.26, -0.08]} rotation={[-0.6, 0, 0]} material={materials.phosphated}>
             <boxGeometry args={[0.16, 0.16, 0.16]} />
-            <primitive object={materials.phosphated} />
           </mesh>
         </group>
 
@@ -460,31 +447,28 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
           position={[-0.29, -0.02, -0.45]}
           rotation={[0.1, 0, 0]}
           castShadow
+          material={materials.phosphated}
           onClick={(e) => {
             e.stopPropagation();
             onPartClick?.('decocker');
           }}
         >
           <boxGeometry args={[0.06, 0.22, 0.36]} />
-          <primitive object={materials.phosphated} />
         </mesh>
 
         {/* Slide Catch / Release Lever */}
-        <mesh position={[-0.29, 0.16, -0.8]}>
+        <mesh position={[-0.29, 0.16, -0.8]} material={materials.phosphated}>
           <boxGeometry args={[0.05, 0.12, 0.32]} />
-          <primitive object={materials.phosphated} />
         </mesh>
 
         {/* Takedown Lever (Palanca de Despiece) */}
-        <mesh position={[-0.29, 0.08, 0.38]}>
+        <mesh position={[-0.29, 0.08, 0.38]} material={materials.phosphated}>
           <cylinderGeometry args={[0.12, 0.12, 0.08, 16]} />
-          <primitive object={materials.phosphated} />
         </mesh>
 
         {/* Push-Button Magazine Release */}
-        <mesh position={[-0.27, -0.48, -0.32]}>
+        <mesh position={[-0.27, -0.48, -0.32]} material={materials.phosphated}>
           <boxGeometry args={[0.08, 0.14, 0.14]} />
-          <primitive object={materials.phosphated} />
         </mesh>
       </group>
 
@@ -501,18 +485,15 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         }}
       >
         {/* Left Grip Panel */}
-        <mesh castShadow>
+        <mesh castShadow material={materials.grips}>
           <boxGeometry args={[0.08, 1.75, 0.88]} />
-          <primitive object={materials.grips} />
         </mesh>
         {/* Round Screw Medallion Surround as in user photo */}
-        <mesh position={[-0.045, 0.25, 0.05]} rotation={[0, -Math.PI / 2, 0]}>
+        <mesh position={[-0.045, 0.25, 0.05]} rotation={[0, -Math.PI / 2, 0]} material={materials.phosphated}>
           <cylinderGeometry args={[0.13, 0.13, 0.02, 20]} />
-          <primitive object={materials.phosphated} />
         </mesh>
-        <mesh position={[-0.05, 0.25, 0.05]} rotation={[0, -Math.PI / 2, 0]}>
+        <mesh position={[-0.05, 0.25, 0.05]} rotation={[0, -Math.PI / 2, 0]} material={materials.steel}>
           <cylinderGeometry args={[0.06, 0.06, 0.025, 16]} />
-          <primitive object={materials.steel} />
         </mesh>
       </group>
 
@@ -526,18 +507,15 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         }}
       >
         {/* Right Grip Panel */}
-        <mesh castShadow>
+        <mesh castShadow material={materials.grips}>
           <boxGeometry args={[0.08, 1.75, 0.88]} />
-          <primitive object={materials.grips} />
         </mesh>
         {/* Round Screw Medallion Surround */}
-        <mesh position={[0.045, 0.25, 0.05]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh position={[0.045, 0.25, 0.05]} rotation={[0, Math.PI / 2, 0]} material={materials.phosphated}>
           <cylinderGeometry args={[0.13, 0.13, 0.02, 20]} />
-          <primitive object={materials.phosphated} />
         </mesh>
-        <mesh position={[0.05, 0.25, 0.05]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh position={[0.05, 0.25, 0.05]} rotation={[0, Math.PI / 2, 0]} material={materials.steel}>
           <cylinderGeometry args={[0.06, 0.06, 0.025, 16]} />
-          <primitive object={materials.steel} />
         </mesh>
       </group>
 
@@ -554,36 +532,34 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         }}
       >
         {/* Steel Magazine Body */}
-        <mesh castShadow>
+        <mesh
+          castShadow
+          material={isMagHighlighted && highlightPart === 'mag_ammo' ? materials.accentHighlight : materials.phosphated}
+        >
           <boxGeometry args={[0.38, 1.82, 0.78]} />
-          <primitive object={isMagHighlighted && highlightPart === 'mag_ammo' ? materials.accentHighlight : materials.phosphated} />
         </mesh>
 
         {/* Characteristic Magazine Bottom Flange / Lip (as in reference photo) */}
-        <mesh position={[0, -0.96, 0.02]} castShadow>
+        <mesh position={[0, -0.96, 0.02]} castShadow material={materials.phosphated}>
           <boxGeometry args={[0.48, 0.14, 0.95]} />
-          <primitive object={materials.phosphated} />
         </mesh>
 
         {/* Witness Holes on Magazine Body */}
         {[-0.5, -0.2, 0.1, 0.4].map((y, idx) => (
-          <mesh key={`hole-${idx}`} position={[0.195, y, 0]}>
+          <mesh key={`hole-${idx}`} position={[0.195, y, 0]} material={materials.steel}>
             <sphereGeometry args={[0.03, 8, 8]} />
-            <primitive object={materials.steel} />
           </mesh>
         ))}
 
         {/* Visible .45 ACP Top Cartridge Ready for Feed */}
         <group position={[0, 0.94, 0.02]}>
           {/* Brass Casing */}
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.brass}>
             <cylinderGeometry args={[0.12, 0.12, 0.52, 16]} />
-            <primitive object={materials.brass} />
           </mesh>
           {/* Copper FMJ Bullet Nose */}
-          <mesh position={[0, 0, 0.32]} rotation={[Math.PI / 2, 0, 0]}>
+          <mesh position={[0, 0, 0.32]} rotation={[Math.PI / 2, 0, 0]} material={materials.copper}>
             <sphereGeometry args={[0.115, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
-            <primitive object={materials.copper} />
           </mesh>
         </group>
       </group>

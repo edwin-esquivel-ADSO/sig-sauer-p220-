@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2, VolumeX, Crosshair, Wrench, Layers, Image as ImageIcon, QrCode } from 'lucide-react';
+import { Volume2, VolumeX, Crosshair, Wrench, Layers, Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { soundEngine } from '../utils/audio';
 
 interface TacticalHUDProps {
@@ -11,7 +11,6 @@ interface TacticalHUDProps {
   totalSteps: number;
   onJumpToWorkbench: () => void;
   onOpenRealPhotoModal: () => void;
-  onOpenQRModal: () => void;
 }
 
 export const TacticalHUD: React.FC<TacticalHUDProps> = ({
@@ -23,7 +22,6 @@ export const TacticalHUD: React.FC<TacticalHUDProps> = ({
   totalSteps,
   onJumpToWorkbench,
   onOpenRealPhotoModal,
-  onOpenQRModal,
 }) => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 pointer-events-none p-2 sm:p-4 md:p-6 flex items-center justify-between gap-2 bg-gradient-to-b from-slate-100/90 via-slate-100/50 to-transparent backdrop-blur-[2px]">
@@ -62,18 +60,18 @@ export const TacticalHUD: React.FC<TacticalHUDProps> = ({
 
       {/* Top Right: Actions & Sound Toggle */}
       <div className="pointer-events-auto flex items-center gap-1.5 sm:gap-2 shrink-0">
-        {/* QR Code Button */}
-        <button
-          onClick={() => {
-            soundEngine.playClick();
-            onOpenQRModal();
-          }}
+        {/* Direct Link to Official SIG Sauer Website */}
+        <a
+          href="https://www.sigsauer.com/p220-nitron-full-size.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => soundEngine.playClick()}
           className="glass-panel-light p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-tactical font-semibold tracking-wider text-slate-700 hover:text-amber-700 hover:border-amber-500/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
-          title="Ver o descargar código QR para escanear en celular"
+          title="Visitar página oficial de la SIG Sauer P220"
         >
-          <QrCode className="w-4 h-4 text-amber-600" />
-          <span className="hidden md:inline">CÓDIGO QR</span>
-        </button>
+          <ExternalLink className="w-4 h-4 text-amber-600" />
+          <span className="hidden md:inline">WEB SIG SAUER</span>
+        </a>
 
         {/* Real Photo Button */}
         <button

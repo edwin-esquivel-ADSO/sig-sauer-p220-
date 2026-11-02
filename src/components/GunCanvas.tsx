@@ -17,13 +17,13 @@ interface GunCanvasProps {
 }
 
 // Camera controller with responsive framing:
-// - On desktop: shifts gun to the RIGHT side (leaving left side for text cards)
+// - On desktop: shifts gun comfortably to the RIGHT side (z: 6.4+, keeping distance from text cards)
 // - On mobile: shifts gun upward to the TOP 38% (leaving bottom half for text cards)
 const CameraController: React.FC<{
   targetPos?: [number, number, number];
   targetLookAt?: [number, number, number];
   isWorkbenchMode: boolean;
-}> = ({ targetPos = [0, 0.4, 5.2], targetLookAt = [0, 0, 0], isWorkbenchMode }) => {
+}> = ({ targetPos = [0, 0.4, 6.4], targetLookAt = [0, 0, 0], isWorkbenchMode }) => {
   const { camera, size } = useThree();
   const currentPos = useRef(new THREE.Vector3(...targetPos));
   const currentTarget = useRef(new THREE.Vector3(...targetLookAt));
@@ -33,7 +33,7 @@ const CameraController: React.FC<{
     if (camera instanceof THREE.PerspectiveCamera) {
       const isMobile = size.width < 768;
       const isTablet = size.width >= 768 && size.width < 1024;
-      camera.fov = isMobile ? 54 : isTablet ? 48 : 44;
+      camera.fov = isMobile ? 54 : isTablet ? 48 : 42;
       camera.updateProjectionMatrix();
     }
   }, [camera, size.width]);
@@ -43,10 +43,10 @@ const CameraController: React.FC<{
       const isMobile = size.width < 768;
       const isDesktop = size.width >= 1024;
 
-      // On desktop, shift camera left so the gun is rendered on the right
-      const offsetX = isDesktop ? -1.35 : 0;
+      // On desktop, shift camera left so the gun is rendered on the right side with breathing room
+      const offsetX = isDesktop ? -1.85 : 0;
       // On mobile, lower camera Y so the weapon projects into the upper 38% of screen
-      const offsetY = isMobile ? -0.95 : 0;
+      const offsetY = isMobile ? -1.05 : 0;
       const zoomAdjust = isMobile ? 1.05 : 1.0;
 
       const destX = (targetPos[0] + offsetX) * zoomAdjust;
@@ -78,7 +78,7 @@ export const GunCanvas: React.FC<GunCanvasProps> = ({
   isFiring = false,
   isDecocked = false,
   isWorkbenchMode = false,
-  cameraPos = [0, 0.4, 5.2],
+  cameraPos = [0, 0.4, 6.4],
   cameraTarget = [0, 0, 0],
   onPartClick,
 }) => {
@@ -92,29 +92,29 @@ export const GunCanvas: React.FC<GunCanvasProps> = ({
           powerPreference: 'high-performance',
           alpha: true,
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 0.92,
+          toneMappingExposure: 0.95,
         }}
-        camera={{ position: cameraPos, fov: 45, near: 0.1, far: 50 }}
+        camera={{ position: cameraPos, fov: 44, near: 0.1, far: 50 }}
       >
         {/* Light studio neutral background */}
         <color attach="background" args={['#f8fafc']} />
 
-        {/* Soft, non-washing studio lighting to keep black metals deeply saturated */}
-        <ambientLight intensity={0.42} color="#f1f5f9" />
+        {/* Studio lighting that preserves rich, velvety black metal */}
+        <ambientLight intensity={0.45} color="#e2e8f0" />
         <directionalLight
-          position={[5, 9, 6]}
-          intensity={0.95}
+          position={[6, 9, 6]}
+          intensity={1.0}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
           shadow-bias={-0.0001}
         />
-        {/* Soft fill light from opposite quadrant */}
-        <directionalLight position={[-5, 4, 3]} intensity={0.4} color="#ffffff" />
-        {/* Soft rim light for steel barrel/slide bevels */}
-        <directionalLight position={[0, -4, -5]} intensity={0.35} color="#e2e8f0" />
-        <pointLight position={[3, 2, 3]} intensity={0.3} color="#f59e0b" />
-        <pointLight position={[-3, 2, 2]} intensity={0.25} color="#0284c7" />
+        {/* Soft fill light */}
+        <directionalLight position={[-6, 4, 3]} intensity={0.4} color="#ffffff" />
+        {/* Subtle rim light for contours */}
+        <directionalLight position={[0, -4, -5]} intensity={0.3} color="#cbd5e1" />
+        <pointLight position={[3, 2, 3]} intensity={0.25} color="#f59e0b" />
+        <pointLight position={[-3, 2, 2]} intensity={0.2} color="#0284c7" />
 
         {/* Camera Transition Control */}
         <CameraController
@@ -128,8 +128,8 @@ export const GunCanvas: React.FC<GunCanvasProps> = ({
           <OrbitControls
             enableDamping
             dampingFactor={0.08}
-            minDistance={2.0}
-            maxDistance={8.5}
+            minDistance={2.5}
+            maxDistance={9.5}
             maxPolarAngle={Math.PI / 1.7}
             minPolarAngle={Math.PI / 6}
           />
@@ -148,8 +148,8 @@ export const GunCanvas: React.FC<GunCanvasProps> = ({
         ) : (
           <Float
             speed={explosionFactor > 0.1 ? 0 : 1.1}
-            rotationIntensity={explosionFactor > 0.1 ? 0 : 0.1}
-            floatIntensity={explosionFactor > 0.1 ? 0 : 0.18}
+            rotationIntensity={explosionFactor > 0.1 ? 0 : 0.08}
+            floatIntensity={explosionFactor > 0.1 ? 0 : 0.15}
           >
             <GunModel3D
               explosionFactor={explosionFactor}
@@ -162,12 +162,12 @@ export const GunCanvas: React.FC<GunCanvasProps> = ({
           </Float>
         )}
 
-        {/* Floor Contact Shadows for tactile realism on light floor */}
+        {/* Floor Contact Shadows */}
         <ContactShadows
           position={[0, -2.3, 0]}
-          opacity={0.35}
-          scale={10}
-          blur={2.4}
+          opacity={0.32}
+          scale={11}
+          blur={2.5}
           far={4.5}
           color="#0f172a"
         />

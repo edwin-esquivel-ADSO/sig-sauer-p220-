@@ -4,15 +4,14 @@ import { TacticalHUD } from './components/TacticalHUD';
 import { ScrollytellingOverlay } from './components/ScrollytellingOverlay';
 import { WorkbenchDossier } from './components/WorkbenchDossier';
 import { RealPhotoModal } from './components/RealPhotoModal';
-import { QRCodeModal } from './components/QRCodeModal';
 import { SCROLL_STEPS } from './data/p220Data';
 import { soundEngine } from './utils/audio';
+import { ExternalLink } from 'lucide-react';
 
 export function App() {
   const [isMuted, setIsMuted] = useState(true);
   const [isWorkbenchMode, setIsWorkbenchMode] = useState(false);
   const [isRealPhotoModalOpen, setIsRealPhotoModalOpen] = useState(false);
-  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   // Workbench 3D controls state
@@ -23,7 +22,7 @@ export function App() {
   const [selectedPartId, setSelectedPartId] = useState('slide');
 
   // Camera state for 3D canvas
-  const [cameraPos, setCameraPos] = useState<[number, number, number]>([0, 0.4, 5.2]);
+  const [cameraPos, setCameraPos] = useState<[number, number, number]>([0, 0.4, 6.4]);
   const [cameraTarget, setCameraTarget] = useState<[number, number, number]>([0, 0, 0]);
   const [highlightPart, setHighlightPart] = useState('all');
 
@@ -79,7 +78,7 @@ export function App() {
   const handleEnterWorkbench = useCallback(() => {
     setIsWorkbenchMode(true);
     setExplosionFactor(0.35); // Initial exploded view in workbench
-    setCameraPos([2.0, 1.2, 4.4]);
+    setCameraPos([2.0, 1.2, 5.8]);
     setCameraTarget([0, 0, 0]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
@@ -123,7 +122,7 @@ export function App() {
     setExplosionFactor(0);
     setIsXRay(false);
     setIsDecocked(false);
-    setCameraPos([0, 0.4, 5.2]);
+    setCameraPos([0, 0.4, 6.4]);
     setCameraTarget([0, 0, 0]);
   }, []);
 
@@ -139,7 +138,6 @@ export function App() {
         totalSteps={SCROLL_STEPS.length}
         onJumpToWorkbench={handleEnterWorkbench}
         onOpenRealPhotoModal={() => setIsRealPhotoModalOpen(true)}
-        onOpenQRModal={() => setIsQRModalOpen(true)}
       />
 
       {/* MODE 1: SCROLLYTELLING VIEW */}
@@ -227,13 +225,7 @@ export function App() {
         onClose={() => setIsRealPhotoModalOpen(false)}
       />
 
-      {/* Integrated QR Code Modal */}
-      <QRCodeModal
-        isOpen={isQRModalOpen}
-        onClose={() => setIsQRModalOpen(false)}
-      />
-
-      {/* Footer */}
+      {/* Clean Footer without QR or Vercel mentions */}
       <footer className="w-full mt-auto py-5 px-4 border-t border-slate-200 bg-white text-center text-xs font-mono text-slate-500 relative z-20">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
           <div className="flex items-center gap-2">
@@ -242,15 +234,17 @@ export function App() {
               SIG SAUER P220 .45 ACP // SISTEMA DE DESPIECE INTERACTIVO 3D
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsQRModalOpen(true)}
-              className="text-amber-700 hover:text-amber-800 font-tactical font-semibold flex items-center gap-1 cursor-pointer"
+          <div>
+            <a
+              href="https://www.sigsauer.com/p220-nitron-full-size.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => soundEngine.playClick()}
+              className="text-amber-700 hover:text-amber-800 font-tactical font-semibold flex items-center gap-1.5 transition-colors cursor-pointer text-xs"
             >
-              <span>ESCANEÁR CÓDIGO QR</span>
-            </button>
-            <span className="text-slate-300">|</span>
-            <span className="text-[10px] sm:text-xs">Listo para Vercel</span>
+              <span>WEB OFICIAL SIG SAUER</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
           </div>
         </div>
       </footer>
