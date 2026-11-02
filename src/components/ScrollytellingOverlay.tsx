@@ -20,16 +20,16 @@ export const ScrollytellingOverlay: React.FC<ScrollytellingOverlayProps> = ({
     <div className="relative w-full z-20 pointer-events-none">
       {/* Scroll indicator when at step 0 */}
       {currentStepIndex === 0 && (
-        <div className="fixed bottom-6 left-4 sm:left-12 lg:left-20 z-30 flex flex-col items-start gap-1.5 pointer-events-auto animate-bounce">
+        <div className="fixed bottom-5 left-3 sm:left-12 lg:left-20 z-30 flex flex-col items-start gap-1 pointer-events-auto animate-bounce">
           <span className="font-tactical text-[10px] sm:text-[11px] uppercase tracking-widest text-amber-800 bg-white/95 px-3 py-1 rounded-full border border-amber-500/30 shadow-md">
             Desliza para despiezar ↓
           </span>
-          <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 ml-4" />
+          <ChevronDown className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-amber-600 ml-4" />
         </div>
       )}
 
       {/* Floating button to view Real Firearm Photo */}
-      <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-30 pointer-events-auto">
+      <div className="fixed bottom-5 right-3 sm:bottom-6 sm:right-6 z-30 pointer-events-auto">
         <button
           onClick={() => {
             soundEngine.playClick();
@@ -37,7 +37,7 @@ export const ScrollytellingOverlay: React.FC<ScrollytellingOverlayProps> = ({
           }}
           className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-white/95 hover:bg-white text-slate-800 hover:text-amber-700 rounded-2xl border border-slate-200 shadow-xl shadow-slate-300/40 text-[11px] sm:text-xs font-tactical font-bold tracking-wider transition-all hover:scale-105 cursor-pointer backdrop-blur-md"
         >
-          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600">
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
             <ImageIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </div>
           <span>FOTO REAL</span>
@@ -69,7 +69,8 @@ export const ScrollytellingOverlay: React.FC<ScrollytellingOverlayProps> = ({
       </div>
 
       {/* Scrolly sections:
-          - On mobile: cards are at bottom (items-end pb-24) leaving the upper 45% for the 3D gun
+          - On mobile: cards are confined strictly to the lower 48vh (items-end pb-20)
+            while the upper 52vh is 100% reserved for the 3D rotating & exploding weapon!
           - On desktop: cards are on the left (justify-start) leaving the right 50% for the 3D gun
       */}
       {SCROLL_STEPS.map((step: ScrollStep, idx: number) => {
@@ -78,43 +79,43 @@ export const ScrollytellingOverlay: React.FC<ScrollytellingOverlayProps> = ({
         return (
           <section
             key={`step-${idx}`}
-            className="min-h-screen flex items-end sm:items-center justify-start p-3 sm:p-8 md:p-12 lg:p-20 pb-24 sm:pb-8 relative"
+            className="min-h-screen flex items-end sm:items-center justify-start p-3 sm:p-8 md:p-12 lg:p-20 pb-20 sm:pb-8 relative"
           >
             {/* Left-side / bottom card container */}
             <div
               className={`w-full max-w-lg lg:max-w-xl transition-all duration-700 transform pointer-events-auto ${
                 isCurrent
                   ? 'opacity-100 translate-y-0 scale-100'
-                  : 'opacity-15 translate-y-8 scale-95'
+                  : 'opacity-10 translate-y-6 scale-95 pointer-events-none'
               }`}
             >
               {/* Tactical Badge */}
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-800 text-[10px] sm:text-xs font-mono font-semibold tracking-wider mb-2 sm:mb-3">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-800 text-[10px] sm:text-xs font-mono font-semibold tracking-wider mb-2">
                 <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-600" />
                 <span>{step.badge}</span>
               </div>
 
-              {/* Main Light Card */}
-              <div className="glass-panel-light p-4 sm:p-7 rounded-2xl border border-slate-200/90 shadow-2xl shadow-slate-200/80 relative overflow-hidden backdrop-blur-xl">
+              {/* Main Light Card with max-h limit on mobile to protect the gun view */}
+              <div className="glass-panel-light p-4 sm:p-7 rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xl shadow-slate-200/80 relative overflow-hidden backdrop-blur-xl max-h-[50vh] sm:max-h-none overflow-y-auto">
                 {/* Accent corner brackets */}
                 <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-amber-600" />
                 <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-amber-600" />
                 <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-amber-600" />
                 <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-amber-600" />
 
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-wide font-tactical mb-0.5 sm:mb-1">
+                <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-wide font-tactical mb-0.5">
                   {step.title}
                 </h2>
-                <h3 className="text-[11px] sm:text-xs md:text-sm font-mono text-amber-700 mb-2.5 sm:mb-4 uppercase tracking-wider font-semibold">
+                <h3 className="text-[11px] sm:text-xs md:text-sm font-mono text-amber-700 mb-2 sm:mb-4 uppercase tracking-wider font-semibold">
                   {step.subtitle}
                 </h3>
 
-                <p className="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed mb-4 sm:mb-6 font-sans">
+                <p className="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed mb-3 sm:mb-6 font-sans">
                   {step.description}
                 </p>
 
                 {/* Tags */}
-                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3.5 sm:mb-6">
                   {step.tags.map((tag, tIdx) => (
                     <span
                       key={tIdx}
@@ -132,14 +133,14 @@ export const ScrollytellingOverlay: React.FC<ScrollytellingOverlayProps> = ({
                       soundEngine.playSlideRack();
                       onEnterWorkbench();
                     }}
-                    className="w-full py-3 px-4 sm:py-3.5 sm:px-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold font-tactical rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 transition-all text-xs sm:text-sm tracking-wider uppercase group cursor-pointer"
+                    className="w-full py-2.5 px-3.5 sm:py-3.5 sm:px-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold font-tactical rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 transition-all text-xs sm:text-sm tracking-wider uppercase group cursor-pointer"
                   >
                     <span>Entrar al Banco de Armería & Dossier</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </button>
                 ) : (
-                  <div className="flex items-center justify-between text-[11px] sm:text-xs text-slate-500 font-mono pt-2.5 sm:pt-3 border-t border-slate-200">
-                    <span>SECCIÓN {idx + 1} DE {SCROLL_STEPS.length}</span>
+                  <div className="flex items-center justify-between text-[10px] sm:text-xs text-slate-500 font-mono pt-2 sm:pt-3 border-t border-slate-200">
+                    <span>FASE {idx + 1} DE {SCROLL_STEPS.length}</span>
                     <button
                       onClick={() => {
                         soundEngine.playClick();

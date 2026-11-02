@@ -18,7 +18,7 @@ interface GunCanvasProps {
 
 // Camera controller with responsive framing:
 // - On desktop: shifts gun to the RIGHT side (leaving left side for text cards)
-// - On mobile: shifts gun upward to the TOP half (leaving bottom half for text cards)
+// - On mobile: shifts gun upward to the TOP 38% (leaving bottom half for text cards)
 const CameraController: React.FC<{
   targetPos?: [number, number, number];
   targetLookAt?: [number, number, number];
@@ -33,7 +33,7 @@ const CameraController: React.FC<{
     if (camera instanceof THREE.PerspectiveCamera) {
       const isMobile = size.width < 768;
       const isTablet = size.width >= 768 && size.width < 1024;
-      camera.fov = isMobile ? 58 : isTablet ? 48 : 44;
+      camera.fov = isMobile ? 54 : isTablet ? 48 : 44;
       camera.updateProjectionMatrix();
     }
   }, [camera, size.width]);
@@ -43,11 +43,11 @@ const CameraController: React.FC<{
       const isMobile = size.width < 768;
       const isDesktop = size.width >= 1024;
 
-      // On desktop, shift camera left so the gun is on the right
+      // On desktop, shift camera left so the gun is rendered on the right
       const offsetX = isDesktop ? -1.35 : 0;
-      // On mobile, elevate camera so the gun is in the top 45% of screen
-      const offsetY = isMobile ? -0.85 : 0;
-      const zoomAdjust = isMobile ? 1.15 : 1.0;
+      // On mobile, lower camera Y so the weapon projects into the upper 38% of screen
+      const offsetY = isMobile ? -0.95 : 0;
+      const zoomAdjust = isMobile ? 1.05 : 1.0;
 
       const destX = (targetPos[0] + offsetX) * zoomAdjust;
       const destY = targetPos[1] + offsetY;
@@ -92,29 +92,29 @@ export const GunCanvas: React.FC<GunCanvasProps> = ({
           powerPreference: 'high-performance',
           alpha: true,
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 0.95,
+          toneMappingExposure: 0.92,
         }}
         camera={{ position: cameraPos, fov: 45, near: 0.1, far: 50 }}
       >
-        {/* Light theme background */}
+        {/* Light studio neutral background */}
         <color attach="background" args={['#f8fafc']} />
 
-        {/* Balanced Studio Lighting that preserves true deep black without specular blowout */}
-        <ambientLight intensity={0.65} />
+        {/* Soft, non-washing studio lighting to keep black metals deeply saturated */}
+        <ambientLight intensity={0.42} color="#f1f5f9" />
         <directionalLight
-          position={[6, 8, 7]}
-          intensity={1.4}
+          position={[5, 9, 6]}
+          intensity={0.95}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
           shadow-bias={-0.0001}
         />
-        {/* Soft fill light */}
-        <directionalLight position={[-6, 4, 3]} intensity={0.7} color="#ffffff" />
-        {/* Subtle rim light for gun contours */}
-        <directionalLight position={[0, -4, -5]} intensity={0.5} color="#e2e8f0" />
-        <pointLight position={[3, 2, 3]} intensity={0.5} color="#f59e0b" />
-        <pointLight position={[-3, 2, 2]} intensity={0.4} color="#0284c7" />
+        {/* Soft fill light from opposite quadrant */}
+        <directionalLight position={[-5, 4, 3]} intensity={0.4} color="#ffffff" />
+        {/* Soft rim light for steel barrel/slide bevels */}
+        <directionalLight position={[0, -4, -5]} intensity={0.35} color="#e2e8f0" />
+        <pointLight position={[3, 2, 3]} intensity={0.3} color="#f59e0b" />
+        <pointLight position={[-3, 2, 2]} intensity={0.25} color="#0284c7" />
 
         {/* Camera Transition Control */}
         <CameraController
@@ -148,8 +148,8 @@ export const GunCanvas: React.FC<GunCanvasProps> = ({
         ) : (
           <Float
             speed={explosionFactor > 0.1 ? 0 : 1.1}
-            rotationIntensity={explosionFactor > 0.1 ? 0 : 0.12}
-            floatIntensity={explosionFactor > 0.1 ? 0 : 0.2}
+            rotationIntensity={explosionFactor > 0.1 ? 0 : 0.1}
+            floatIntensity={explosionFactor > 0.1 ? 0 : 0.18}
           >
             <GunModel3D
               explosionFactor={explosionFactor}
@@ -169,7 +169,7 @@ export const GunCanvas: React.FC<GunCanvasProps> = ({
           scale={10}
           blur={2.4}
           far={4.5}
-          color="#1e293b"
+          color="#0f172a"
         />
       </Canvas>
     </div>
