@@ -16,8 +16,9 @@ interface GunCanvasProps {
   onPartClick?: (partId: string) => void;
 }
 
-// Camera controller that smoothly transitions during scrollytelling
-// On desktop screens, it shifts the focus so the gun floats clearly on the RIGHT half of the viewport
+// Camera controller with responsive framing:
+// - On desktop: shifts gun to the RIGHT side (leaving left side for text cards)
+// - On mobile: shifts gun upward to the TOP half (leaving bottom half for text cards)
 const CameraController: React.FC<{
   targetPos?: [number, number, number];
   targetLookAt?: [number, number, number];
@@ -27,25 +28,29 @@ const CameraController: React.FC<{
   const currentPos = useRef(new THREE.Vector3(...targetPos));
   const currentTarget = useRef(new THREE.Vector3(...targetLookAt));
 
-  // Auto-adjust FOV and horizontal offset for desktop vs mobile
+  // Dynamic FOV tuning
   useEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera) {
-      const isMobile = size.width < 1024;
-      camera.fov = isMobile ? 54 : 44;
+      const isMobile = size.width < 768;
+      const isTablet = size.width >= 768 && size.width < 1024;
+      camera.fov = isMobile ? 58 : isTablet ? 48 : 44;
       camera.updateProjectionMatrix();
     }
   }, [camera, size.width]);
 
   useFrame((_, delta) => {
     if (!isWorkbenchMode) {
+      const isMobile = size.width < 768;
       const isDesktop = size.width >= 1024;
-      // In scrollytelling mode on desktop:
-      // Offset camera target to the LEFT so the gun appears centered on the RIGHT half
+
+      // On desktop, shift camera left so the gun is on the right
       const offsetX = isDesktop ? -1.35 : 0;
-      const zoomAdjust = size.width < 768 ? 1.25 : 1.0;
+      // On mobile, elevate camera so the gun is in the top 45% of screen
+      const offsetY = isMobile ? -0.85 : 0;
+      const zoomAdjust = isMobile ? 1.15 : 1.0;
 
       const destX = (targetPos[0] + offsetX) * zoomAdjust;
-      const destY = targetPos[1];
+      const destY = targetPos[1] + offsetY;
       const destZ = targetPos[2] * zoomAdjust;
 
       currentPos.current.x = THREE.MathUtils.lerp(currentPos.current.x, destX, delta * 3.5);
@@ -53,8 +58,9 @@ const CameraController: React.FC<{
       currentPos.current.z = THREE.MathUtils.lerp(currentPos.current.z, destZ, delta * 3.5);
 
       const lookTargetX = targetLookAt[0] + offsetX;
+      const lookTargetY = targetLookAt[1] + offsetY;
       currentTarget.current.x = THREE.MathUtils.lerp(currentTarget.current.x, lookTargetX, delta * 3.5);
-      currentTarget.current.y = THREE.MathUtils.lerp(currentTarget.current.y, targetLookAt[1], delta * 3.5);
+      currentTarget.current.y = THREE.MathUtils.lerp(currentTarget.current.y, lookTargetY, delta * 3.5);
       currentTarget.current.z = THREE.MathUtils.lerp(currentTarget.current.z, targetLookAt[2], delta * 3.5);
 
       camera.position.copy(currentPos.current);
@@ -85,28 +91,30 @@ export const GunCanvas: React.FC<GunCanvasProps> = ({
           antialias: true,
           powerPreference: 'high-performance',
           alpha: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 0.95,
         }}
-        camera={{ position: cameraPos, fov: 44, near: 0.1, far: 50 }}
+        camera={{ position: cameraPos, fov: 45, near: 0.1, far: 50 }}
       >
         {/* Light theme background */}
         <color attach="background" args={['#f8fafc']} />
 
-        {/* High-End Studio Photo Lighting for crisp black & gunmetal gray */}
-        <ambientLight intensity={1.5} />
+        {/* Balanced Studio Lighting that preserves true deep black without specular blowout */}
+        <ambientLight intensity={0.65} />
         <directionalLight
-          position={[7, 10, 8]}
-          intensity={2.4}
+          position={[6, 8, 7]}
+          intensity={1.4}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
           shadow-bias={-0.0001}
         />
-        {/* Fill light from left */}
-        <directionalLight position={[-8, 6, 4]} intensity={1.2} color="#ffffff" />
-        {/* Crisp rim light for slide contours */}
-        <directionalLight position={[0, -5, -6]} intensity={0.9} color="#e2e8f0" />
-        <pointLight position={[3, 2, 3]} intensity={0.8} color="#f59e0b" />
-        <pointLight position={[-3, 3, 2]} intensity={0.6} color="#0284c7" />
+        {/* Soft fill light */}
+        <directionalLight position={[-6, 4, 3]} intensity={0.7} color="#ffffff" />
+        {/* Subtle rim light for gun contours */}
+        <directionalLight position={[0, -4, -5]} intensity={0.5} color="#e2e8f0" />
+        <pointLight position={[3, 2, 3]} intensity={0.5} color="#f59e0b" />
+        <pointLight position={[-3, 2, 2]} intensity={0.4} color="#0284c7" />
 
         {/* Camera Transition Control */}
         <CameraController

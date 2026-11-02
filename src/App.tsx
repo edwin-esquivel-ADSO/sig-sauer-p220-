@@ -139,10 +139,10 @@ export function App() {
         onOpenRealPhotoModal={() => setIsRealPhotoModalOpen(true)}
       />
 
-      {/* MODE 1: SCROLLYTELLING VIEW (Gun on the RIGHT, text cards on the LEFT) */}
+      {/* MODE 1: SCROLLYTELLING VIEW */}
       {!isWorkbenchMode ? (
         <div className="relative w-full">
-          {/* Fixed 3D Viewport in background - shifted to the right on desktop */}
+          {/* Fixed 3D Viewport in background */}
           <div className="fixed inset-0 z-0 pointer-events-auto">
             <GunCanvas
               explosionFactor={explosionFactor}
@@ -163,7 +163,7 @@ export function App() {
             <div className="absolute inset-0 pointer-events-none bg-radial-vignette-light" />
           </div>
 
-          {/* Foreground Scroll Overlay with step cards anchored to the left */}
+          {/* Foreground Scroll Overlay with step cards */}
           <ScrollytellingOverlay
             currentStepIndex={currentStepIndex}
             onSelectStep={handleSelectStep}
@@ -173,9 +173,9 @@ export function App() {
         </div>
       ) : (
         /* MODE 2: INTERACTIVE WORKBENCH & HISTORICAL DOSSIER */
-        <div className="relative w-full flex flex-col pt-16 md:pt-20">
+        <div className="relative w-full flex flex-col pt-14 sm:pt-16 md:pt-20">
           {/* Persistent Interactive 3D Canvas Box */}
-          <div className="w-full h-[48vh] sm:h-[55vh] lg:h-[62vh] relative bg-gradient-to-b from-[#ffffff] to-[#f1f5f9] border-b border-slate-200 shadow-md">
+          <div className="w-full h-[44vh] sm:h-[52vh] lg:h-[60vh] relative bg-gradient-to-b from-white via-slate-50 to-slate-100 border-b border-slate-200 shadow-sm">
             <GunCanvas
               explosionFactor={explosionFactor}
               highlightPart={selectedPartId}
@@ -191,10 +191,10 @@ export function App() {
               }}
             />
 
-            {/* Subtle 3D Interaction Hint overlay */}
-            <div className="absolute bottom-3 left-4 pointer-events-none text-[11px] font-mono text-slate-600 bg-white/95 px-3 py-1 rounded-full border border-slate-200 flex items-center gap-2 shadow-sm backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-              <span>Gira 360° con ratón o dedo • Zoom con pellizco / rueda</span>
+            {/* Subtle 3D Interaction Hint overlay placed at bottom right to avoid header overlap */}
+            <div className="absolute bottom-3 right-4 pointer-events-none text-[10px] sm:text-[11px] font-mono text-slate-600 bg-white/95 px-3 py-1 rounded-full border border-slate-200 flex items-center gap-1.5 shadow-sm backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping shrink-0" />
+              <span>Gira 360° • Zoom táctil</span>
             </div>
           </div>
 
@@ -225,16 +225,16 @@ export function App() {
       />
 
       {/* Footer */}
-      <footer className="w-full mt-auto py-6 px-4 border-t border-slate-200 bg-white text-center text-xs font-mono text-slate-500 relative z-20">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="w-full mt-auto py-5 px-4 border-t border-slate-200 bg-white text-center text-xs font-mono text-slate-500 relative z-20">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-600" />
-            <span className="text-slate-700 font-tactical font-semibold tracking-wider">
+            <span className="text-slate-700 font-tactical font-semibold tracking-wider text-[11px] sm:text-xs">
               SIG SAUER P220 .45 ACP // SISTEMA DE DESPIECE INTERACTIVO 3D
             </span>
           </div>
           <div>
-            <span>Diseño de alta precisión militar • Optimizado para móviles & Vercel</span>
+            <span className="text-[10px] sm:text-xs">Diseño de alta precisión militar • Optimizado para móviles & Vercel</span>
           </div>
         </div>
       </footer>

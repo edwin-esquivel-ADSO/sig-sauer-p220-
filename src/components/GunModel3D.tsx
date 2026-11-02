@@ -46,7 +46,8 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
   const smoothExplosion = useRef(0);
   const fireAnim = useRef(0);
 
-  // Strictly typed PBR & X-Ray Materials tuned to match the authentic real firearm
+  // PBR Materials tuned specifically for authentic Nitron black & brushed steel on light backgrounds
+  // High metalness on white backgrounds causes white reflections; low metalness + controlled roughness ensures true matte black
   const materials: MaterialPalette = useMemo(() => {
     if (isXRay) {
       const xrayMat = new THREE.MeshStandardMaterial({
@@ -74,14 +75,14 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         phosphated: xraySteel,
         grips: xrayMat,
         brass: new THREE.MeshStandardMaterial({
-          color: 0xfbbf24,
-          metalness: 0.9,
-          roughness: 0.2,
-        }),
-        copper: new THREE.MeshStandardMaterial({
-          color: 0xd97706,
+          color: 0xd4af37,
           metalness: 0.85,
           roughness: 0.25,
+        }),
+        copper: new THREE.MeshStandardMaterial({
+          color: 0xb45309,
+          metalness: 0.8,
+          roughness: 0.3,
         }),
         tritium: new THREE.MeshBasicMaterial({ color: 0x16a34a }),
         accentHighlight: new THREE.MeshStandardMaterial({
@@ -96,57 +97,57 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
     }
 
     return {
-      // Deep Satin Nitron Black for Slide (as in reference photograph)
+      // True Satin Nitron Black for Slide (PVD TiCN finish) - Deep black with soft highlights
       nitron: new THREE.MeshStandardMaterial({
-        color: 0x181a1d,
-        metalness: 0.82,
-        roughness: 0.35,
-      }),
-      // Matte Anodized Hard-Coat Black for Aluminum Frame
-      nitronFrame: new THREE.MeshStandardMaterial({
-        color: 0x151619,
-        metalness: 0.75,
+        color: 0x141619,
+        metalness: 0.28,
         roughness: 0.42,
       }),
-      // Brushed Stainless Steel for Chamber Hood, Barrel & Guide Rod
+      // Matte Type III Hard-Coat Anodized Black for Aluminum Frame
+      nitronFrame: new THREE.MeshStandardMaterial({
+        color: 0x101114,
+        metalness: 0.2,
+        roughness: 0.52,
+      }),
+      // Brushed 416R Stainless Steel for Chamber Hood & Barrel Exterior
       steel: new THREE.MeshStandardMaterial({
-        color: 0xcfd4de,
-        metalness: 0.96,
-        roughness: 0.22,
+        color: 0xd1d5db,
+        metalness: 0.88,
+        roughness: 0.25,
       }),
       // Phosphated / Tool Steel for Extractor, Pins & Levers
       phosphated: new THREE.MeshStandardMaterial({
-        color: 0x25282f,
-        metalness: 0.65,
-        roughness: 0.58,
+        color: 0x23262d,
+        metalness: 0.4,
+        roughness: 0.6,
       }),
-      // Checkered Black Polymer / G10 Grips
+      // Checkered Deep Black Grips (as shown in reference photo)
       grips: new THREE.MeshStandardMaterial({
-        color: 0x111215,
-        metalness: 0.12,
-        roughness: 0.84,
+        color: 0x0d0e10,
+        metalness: 0.08,
+        roughness: 0.88,
       }),
-      // High Polish Brass Casing
+      // Polished Brass Cartridge Casing
       brass: new THREE.MeshStandardMaterial({
         color: 0xd4af37,
-        metalness: 0.94,
-        roughness: 0.24,
+        metalness: 0.92,
+        roughness: 0.22,
       }),
-      // Copper FMJ Bullet Nose
+      // Copper Full Metal Jacket (FMJ) Bullet Nose
       copper: new THREE.MeshStandardMaterial({
-        color: 0xbf5700,
-        metalness: 0.88,
+        color: 0xb45309,
+        metalness: 0.85,
         roughness: 0.28,
       }),
-      // Night Sights High-Contrast Green Dots
+      // Tritium Night Sights Contrast Green Dots
       tritium: new THREE.MeshBasicMaterial({ color: 0x22c55e }),
       // Active Selection Highlight
       accentHighlight: new THREE.MeshStandardMaterial({
         color: 0xd97706,
-        metalness: 0.6,
-        roughness: 0.28,
+        metalness: 0.35,
+        roughness: 0.3,
         emissive: 0xd97706,
-        emissiveIntensity: 0.5,
+        emissiveIntensity: 0.45,
       }),
     };
   }, [isXRay]);
@@ -373,9 +374,9 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         <mesh position={[0, 0.12, 0.75]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.12, 0.12, 1.95, 16, 1, true]} />
           <meshStandardMaterial
-            color={0x2d323b}
-            roughness={0.4}
-            metalness={0.9}
+            color={0x334155}
+            roughness={0.5}
+            metalness={0.7}
             wireframe={true}
           />
         </mesh>
@@ -415,7 +416,7 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
           <primitive object={materials.nitronFrame} />
         </mesh>
 
-        {/* Ergonomic Trigger Guard with Combat Recurve (Exactly matching reference photo) */}
+        {/* Ergonomic Trigger Guard with Combat Recurve (matching reference photo) */}
         <mesh position={[0, -0.44, 0.35]}>
           <torusGeometry args={[0.42, 0.06, 12, 28, Math.PI * 0.95]} />
           <primitive object={materials.nitronFrame} />
@@ -487,7 +488,7 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
       </group>
 
       {/* ================================================================= */}
-      {/* 5. GRIP PANELS (CACHAS TEXTURADAS CON MEDALLÓN SEGÚN FOTO)        */}
+      {/* 5. GRIP PANELS (CACHAS PICADAS CON MEDALLÓN SEGÚN FOTO)           */}
       {/* ================================================================= */}
       <group
         ref={leftGripRef}
