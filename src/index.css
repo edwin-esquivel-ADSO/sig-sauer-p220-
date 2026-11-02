@@ -10,13 +10,13 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: #06070b;
-    color: #e2e8f0;
+    background-color: #f8fafc;
+    color: #1e293b;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -26,58 +26,41 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #090b10;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #272f3d;
+  background: #cbd5e1;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #f59e0b;
+  background: #d97706;
 }
 
-/* Military crosshair and grid backgrounds */
-.bg-tactical-grid {
+/* Tactical military grid background for light mode */
+.bg-tactical-grid-light {
   background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
 }
 
-.bg-radial-vignette {
-  background: radial-gradient(circle at center, transparent 30%, rgba(6, 7, 11, 0.85) 90%);
+.bg-radial-vignette-light {
+  background: radial-gradient(circle at center, transparent 40%, rgba(241, 245, 249, 0.6) 100%);
 }
 
-.glass-panel {
-  background: rgba(13, 17, 25, 0.75);
+/* High-end clean light glass panels */
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 4px 6px -2px rgba(15, 23, 42, 0.03);
 }
 
-.glass-panel-glow {
-  background: rgba(15, 23, 42, 0.8);
+.glass-panel-light-glow {
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  box-shadow: 0 0 25px rgba(245, 158, 11, 0.1);
-}
-
-/* Tactical HUD scanline */
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(1000%); }
-}
-
-.animate-scanline {
-  animation: scanline 8s linear infinite;
-}
-
-/* Text glow */
-.text-glow-amber {
-  text-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
-}
-
-.text-glow-cyan {
-  text-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  box-shadow: 0 12px 35px -5px rgba(217, 119, 6, 0.12);
 }

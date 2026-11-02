@@ -46,25 +46,25 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
   const smoothExplosion = useRef(0);
   const fireAnim = useRef(0);
 
-  // Strictly typed PBR & X-Ray Materials
+  // Strictly typed PBR & X-Ray Materials tuned to match the authentic real firearm
   const materials: MaterialPalette = useMemo(() => {
     if (isXRay) {
       const xrayMat = new THREE.MeshStandardMaterial({
-        color: 0x06b6d4,
+        color: 0x0284c7,
         wireframe: true,
         transparent: true,
-        opacity: 0.45,
-        emissive: 0x0891b2,
-        emissiveIntensity: 0.3,
+        opacity: 0.55,
+        emissive: 0x0369a1,
+        emissiveIntensity: 0.4,
       });
 
       const xraySteel = new THREE.MeshStandardMaterial({
-        color: 0x38bdf8,
+        color: 0x0ea5e9,
         wireframe: true,
         transparent: true,
-        opacity: 0.6,
+        opacity: 0.65,
         emissive: 0x0284c7,
-        emissiveIntensity: 0.4,
+        emissiveIntensity: 0.45,
       });
 
       return {
@@ -83,61 +83,70 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
           metalness: 0.85,
           roughness: 0.25,
         }),
-        tritium: new THREE.MeshBasicMaterial({ color: 0x22c55e }),
+        tritium: new THREE.MeshBasicMaterial({ color: 0x16a34a }),
         accentHighlight: new THREE.MeshStandardMaterial({
-          color: 0xf59e0b,
+          color: 0xd97706,
           wireframe: false,
           transparent: true,
-          opacity: 0.7,
-          emissive: 0xd97706,
-          emissiveIntensity: 0.5,
+          opacity: 0.75,
+          emissive: 0xb45309,
+          emissiveIntensity: 0.6,
         }),
       };
     }
 
     return {
+      // Deep Satin Nitron Black for Slide (as in reference photograph)
       nitron: new THREE.MeshStandardMaterial({
-        color: 0x181a1e,
-        metalness: 0.85,
-        roughness: 0.38,
+        color: 0x181a1d,
+        metalness: 0.82,
+        roughness: 0.35,
       }),
+      // Matte Anodized Hard-Coat Black for Aluminum Frame
       nitronFrame: new THREE.MeshStandardMaterial({
-        color: 0x141518,
+        color: 0x151619,
         metalness: 0.75,
-        roughness: 0.45,
+        roughness: 0.42,
       }),
+      // Brushed Stainless Steel for Chamber Hood, Barrel & Guide Rod
       steel: new THREE.MeshStandardMaterial({
-        color: 0xd6d9e0,
-        metalness: 0.95,
+        color: 0xcfd4de,
+        metalness: 0.96,
         roughness: 0.22,
       }),
+      // Phosphated / Tool Steel for Extractor, Pins & Levers
       phosphated: new THREE.MeshStandardMaterial({
-        color: 0x2b2e35,
-        metalness: 0.6,
-        roughness: 0.65,
+        color: 0x25282f,
+        metalness: 0.65,
+        roughness: 0.58,
       }),
+      // Checkered Black Polymer / G10 Grips
       grips: new THREE.MeshStandardMaterial({
-        color: 0x151619,
-        metalness: 0.15,
-        roughness: 0.78,
+        color: 0x111215,
+        metalness: 0.12,
+        roughness: 0.84,
       }),
+      // High Polish Brass Casing
       brass: new THREE.MeshStandardMaterial({
         color: 0xd4af37,
-        metalness: 0.92,
-        roughness: 0.25,
+        metalness: 0.94,
+        roughness: 0.24,
       }),
+      // Copper FMJ Bullet Nose
       copper: new THREE.MeshStandardMaterial({
         color: 0xbf5700,
         metalness: 0.88,
         roughness: 0.28,
       }),
+      // Night Sights High-Contrast Green Dots
       tritium: new THREE.MeshBasicMaterial({ color: 0x22c55e }),
+      // Active Selection Highlight
       accentHighlight: new THREE.MeshStandardMaterial({
-        color: 0xf59e0b,
-        metalness: 0.5,
-        roughness: 0.3,
-        emissive: 0xf59e0b,
-        emissiveIntensity: 0.4,
+        color: 0xd97706,
+        metalness: 0.6,
+        roughness: 0.28,
+        emissive: 0xd97706,
+        emissiveIntensity: 0.5,
       }),
     };
   }, [isXRay]);
@@ -406,7 +415,7 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
           <primitive object={materials.nitronFrame} />
         </mesh>
 
-        {/* Ergonomic Trigger Guard with Combat Recurve */}
+        {/* Ergonomic Trigger Guard with Combat Recurve (Exactly matching reference photo) */}
         <mesh position={[0, -0.44, 0.35]}>
           <torusGeometry args={[0.42, 0.06, 12, 28, Math.PI * 0.95]} />
           <primitive object={materials.nitronFrame} />
@@ -428,17 +437,16 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
         <group ref={triggerRef} position={[0, -0.32, 0.32]}>
           <mesh rotation={[0.3, 0, 0]} castShadow>
             <boxGeometry args={[0.12, 0.42, 0.14]} />
-            <primitive object={materials.steel} />
+            <primitive object={materials.phosphated} />
           </mesh>
         </group>
 
-        {/* External Skeletonized Combat Hammer */}
+        {/* External Combat Hammer with Serrated Thumb Spur */}
         <group ref={hammerRef} position={[0, 0.35, -1.55]}>
           <mesh rotation={[-0.2, 0, 0]} castShadow>
             <boxGeometry args={[0.14, 0.52, 0.25]} />
-            <primitive object={materials.steel} />
+            <primitive object={materials.phosphated} />
           </mesh>
-          {/* Hammer Serrated Thumb Spur */}
           <mesh position={[0, 0.26, -0.08]} rotation={[-0.6, 0, 0]}>
             <boxGeometry args={[0.16, 0.16, 0.16]} />
             <primitive object={materials.phosphated} />
@@ -479,7 +487,7 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
       </group>
 
       {/* ================================================================= */}
-      {/* 5. GRIP PANELS (CACHAS G10 / TEXTURADAS CON MEDALLÓN)             */}
+      {/* 5. GRIP PANELS (CACHAS TEXTURADAS CON MEDALLÓN SEGÚN FOTO)        */}
       {/* ================================================================= */}
       <group
         ref={leftGripRef}
@@ -495,9 +503,13 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
           <boxGeometry args={[0.08, 1.75, 0.88]} />
           <primitive object={materials.grips} />
         </mesh>
-        {/* SIG Sauer Emblem Medallion */}
-        <mesh position={[-0.045, 0.1, 0]} rotation={[0, -Math.PI / 2, 0]}>
-          <cylinderGeometry args={[0.12, 0.12, 0.02, 16]} />
+        {/* Round Screw Medallion Surround as in user photo */}
+        <mesh position={[-0.045, 0.25, 0.05]} rotation={[0, -Math.PI / 2, 0]}>
+          <cylinderGeometry args={[0.13, 0.13, 0.02, 20]} />
+          <primitive object={materials.phosphated} />
+        </mesh>
+        <mesh position={[-0.05, 0.25, 0.05]} rotation={[0, -Math.PI / 2, 0]}>
+          <cylinderGeometry args={[0.06, 0.06, 0.025, 16]} />
           <primitive object={materials.steel} />
         </mesh>
       </group>
@@ -516,9 +528,13 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
           <boxGeometry args={[0.08, 1.75, 0.88]} />
           <primitive object={materials.grips} />
         </mesh>
-        {/* SIG Sauer Emblem Medallion */}
-        <mesh position={[0.045, 0.1, 0]} rotation={[0, Math.PI / 2, 0]}>
-          <cylinderGeometry args={[0.12, 0.12, 0.02, 16]} />
+        {/* Round Screw Medallion Surround */}
+        <mesh position={[0.045, 0.25, 0.05]} rotation={[0, Math.PI / 2, 0]}>
+          <cylinderGeometry args={[0.13, 0.13, 0.02, 20]} />
+          <primitive object={materials.phosphated} />
+        </mesh>
+        <mesh position={[0.05, 0.25, 0.05]} rotation={[0, Math.PI / 2, 0]}>
+          <cylinderGeometry args={[0.06, 0.06, 0.025, 16]} />
           <primitive object={materials.steel} />
         </mesh>
       </group>
@@ -541,10 +557,10 @@ export const GunModel3D: React.FC<GunModel3DProps> = ({
           <primitive object={isMagHighlighted && highlightPart === 'mag_ammo' ? materials.accentHighlight : materials.phosphated} />
         </mesh>
 
-        {/* Polymer Magazine Baseplate / Floorplate */}
+        {/* Characteristic Magazine Bottom Flange / Lip (as in reference photo) */}
         <mesh position={[0, -0.96, 0.02]} castShadow>
           <boxGeometry args={[0.48, 0.14, 0.95]} />
-          <primitive object={materials.grips} />
+          <primitive object={materials.phosphated} />
         </mesh>
 
         {/* Witness Holes on Magazine Body */}

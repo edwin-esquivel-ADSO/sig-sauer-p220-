@@ -3,12 +3,14 @@ import { GunCanvas } from './components/GunCanvas';
 import { TacticalHUD } from './components/TacticalHUD';
 import { ScrollytellingOverlay } from './components/ScrollytellingOverlay';
 import { WorkbenchDossier } from './components/WorkbenchDossier';
+import { RealPhotoModal } from './components/RealPhotoModal';
 import { SCROLL_STEPS } from './data/p220Data';
 import { soundEngine } from './utils/audio';
 
 export function App() {
   const [isMuted, setIsMuted] = useState(true);
   const [isWorkbenchMode, setIsWorkbenchMode] = useState(false);
+  const [isRealPhotoModalOpen, setIsRealPhotoModalOpen] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   // Workbench 3D controls state
@@ -124,7 +126,7 @@ export function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col relative bg-tactical-grid selection:bg-amber-500/30">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800 flex flex-col relative bg-tactical-grid-light selection:bg-amber-500/20">
       {/* Top Tactical HUD */}
       <TacticalHUD
         isMuted={isMuted}
@@ -134,12 +136,13 @@ export function App() {
         currentStepIndex={currentStepIndex}
         totalSteps={SCROLL_STEPS.length}
         onJumpToWorkbench={handleEnterWorkbench}
+        onOpenRealPhotoModal={() => setIsRealPhotoModalOpen(true)}
       />
 
-      {/* MODE 1: SCROLLYTELLING VIEW */}
+      {/* MODE 1: SCROLLYTELLING VIEW (Gun on the RIGHT, text cards on the LEFT) */}
       {!isWorkbenchMode ? (
         <div className="relative w-full">
-          {/* Fixed 3D Viewport in background */}
+          {/* Fixed 3D Viewport in background - shifted to the right on desktop */}
           <div className="fixed inset-0 z-0 pointer-events-auto">
             <GunCanvas
               explosionFactor={explosionFactor}
@@ -156,22 +159,23 @@ export function App() {
                 handleEnterWorkbench();
               }}
             />
-            {/* Subtle vignette shadow around 3D canvas */}
-            <div className="absolute inset-0 pointer-events-none bg-radial-vignette" />
+            {/* Soft ambient vignette */}
+            <div className="absolute inset-0 pointer-events-none bg-radial-vignette-light" />
           </div>
 
-          {/* Foreground Scroll Overlay with step cards */}
+          {/* Foreground Scroll Overlay with step cards anchored to the left */}
           <ScrollytellingOverlay
             currentStepIndex={currentStepIndex}
             onSelectStep={handleSelectStep}
             onEnterWorkbench={handleEnterWorkbench}
+            onOpenRealPhotoModal={() => setIsRealPhotoModalOpen(true)}
           />
         </div>
       ) : (
         /* MODE 2: INTERACTIVE WORKBENCH & HISTORICAL DOSSIER */
         <div className="relative w-full flex flex-col pt-16 md:pt-20">
           {/* Persistent Interactive 3D Canvas Box */}
-          <div className="w-full h-[48vh] sm:h-[55vh] lg:h-[62vh] relative bg-gradient-to-b from-[#0a0d14] to-[#07090e] border-b border-white/10 shadow-2xl">
+          <div className="w-full h-[48vh] sm:h-[55vh] lg:h-[62vh] relative bg-gradient-to-b from-[#ffffff] to-[#f1f5f9] border-b border-slate-200 shadow-md">
             <GunCanvas
               explosionFactor={explosionFactor}
               highlightPart={selectedPartId}
@@ -188,9 +192,9 @@ export function App() {
             />
 
             {/* Subtle 3D Interaction Hint overlay */}
-            <div className="absolute bottom-3 left-4 pointer-events-none text-[11px] font-mono text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded-md border border-white/10 flex items-center gap-1.5 backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              <span>Gira con un dedo o ratón • Zoom con pellizco / rueda</span>
+            <div className="absolute bottom-3 left-4 pointer-events-none text-[11px] font-mono text-slate-600 bg-white/95 px-3 py-1 rounded-full border border-slate-200 flex items-center gap-2 shadow-sm backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+              <span>Gira 360° con ratón o dedo • Zoom con pellizco / rueda</span>
             </div>
           </div>
 
@@ -209,21 +213,28 @@ export function App() {
             onSelectPart={(partId) => {
               setSelectedPartId(partId);
             }}
+            onOpenRealPhotoModal={() => setIsRealPhotoModalOpen(true)}
           />
         </div>
       )}
 
+      {/* Real Photograph Lightbox / Modal */}
+      <RealPhotoModal
+        isOpen={isRealPhotoModalOpen}
+        onClose={() => setIsRealPhotoModalOpen(false)}
+      />
+
       {/* Footer */}
-      <footer className="w-full mt-auto py-6 px-4 border-t border-white/10 bg-[#050609] text-center text-xs font-mono text-slate-500 relative z-20">
+      <footer className="w-full mt-auto py-6 px-4 border-t border-slate-200 bg-white text-center text-xs font-mono text-slate-500 relative z-20">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-500" />
-            <span className="text-slate-400 font-tactical font-semibold tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-amber-600" />
+            <span className="text-slate-700 font-tactical font-semibold tracking-wider">
               SIG SAUER P220 .45 ACP // SISTEMA DE DESPIECE INTERACTIVO 3D
             </span>
           </div>
           <div>
-            <span>Desarrollado para alta precisión técnica • Listo para Vercel</span>
+            <span>Diseño de alta precisión militar • Optimizado para móviles & Vercel</span>
           </div>
         </div>
       </footer>
